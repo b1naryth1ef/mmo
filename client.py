@@ -1,14 +1,10 @@
-import socket, zlib, thread, json, collections, time
+import socket, zlib, thread, json, time
 
 PROTOCOL_VERSION = 1
 
 HOST = 'localhost'
 PORT = 1338
 PREFIX = {'start':'', 'end':'\r\n'}
-
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# s.connect((HOST, PORT))
-# s.send('\x01'+zlib.compress('Very very very long message about lots of things that are very very important *&#(${}:ASD<>XCBM#?'))
 
 class Client():
 	def __init__(self, data=('localhost', 27960)):
@@ -24,7 +20,6 @@ class Client():
 
 		self.SERVER_EVENTS = {
 		'PING':self.event_PING,
-		'SERVER_FULL':self.event_FULL,
 		'WELCOME':self.event_WELCOME,
 		'KICK':self.event_KICK,
 		}
@@ -84,8 +79,6 @@ class Client():
 				return newline
 				
 	def parse(self, line): pass
-	def event_FULL(self, E): pass
-	def event_LOGIN(self, E): pass
 	def event_PING(self, E): pass
 	def event_WELCOME(self, E): pass
 	def event_KICK(self, E):
