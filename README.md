@@ -32,6 +32,3 @@ Client is considered joined at this point
 
 # Note Bene
 - I'm a nubs at some of this stuff. Dwi!
-
-# Todo
-- Near 100% cpu usage when a client is active. Doing it wrong? ()
