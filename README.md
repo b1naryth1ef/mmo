@@ -1,5 +1,5 @@
 # About
-This is a project to create a Text-Based MMO Game. It's based off Pythons *built-in* asyncore networking stuff. I probablly could have used Twisted, but it seemed overly bulky for this type of project. 
+This is a project to create a Text-Based MMO Game. It's written in Python using Twisted for server side, and the built-in socket for client side. The gui is written with PygCurse (an awesome PyGame Curse's Library).
 
 # Code
 It's released under BSD. For information on licensing and usage, please see license.txt.
