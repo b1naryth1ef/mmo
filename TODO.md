@@ -1,0 +1,3 @@
+- Kick should be \x02 with a reason
+- Client code needs to be cleaned up. Maybe move to a more event-like system?
+- Server should be disconnecting clients...
