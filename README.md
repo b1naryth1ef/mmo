@@ -9,26 +9,26 @@ I use a tagging system created by myself. It's fairly easy to read so I wont pro
 
 # Server/Client protocol
 ## Packet Prefixes
-`\x00`: Plain text (aka just an event, no data)
-`\x01`: Zlib.
-`\x02`: Json compress with zlib. (Is always a dict, with at least key 'tag')
+- `\x00`: Plain text (aka just an event, no data)
+- `\x01`: Zlib.
+- `\x02`: Json compress with zlib. (Is always a dict, with at least key 'tag')    
 
 ## Server Packet Tags
-PING
-WELCOME
-KICK
+PING    
+WELCOME    
+KICK    
 
 ## Client Packet Tags
-HELLO
-JOIN_REQ
-AUTH
-PONG
+HELLO    
+JOIN_REQ    
+AUTH    
+PONG    
 
 ## Joining
-Client >< Server: Gets hello, gets info. Checks protocol version, and if server is full.
-Client > Server: JOIN_REQ, a `\x02` packet tagged the same with username and a hash (none if we're a new user)
-Client < Server: KICK or WELCOME with motd and a new user hash
-Client is considered joined at this point
+Client >< Server: Gets hello, gets info. Checks protocol version, and if server is full.    
+Client > Server: JOIN_REQ, a `\x02` packet tagged the same with username and a hash (none if we're a new user)    
+Client < Server: KICK or WELCOME with motd and a new user hash    
+Client is considered joined at this point    
 
 # Note Bene
 - I'm a nubs at some of this stuff. Dwi!
