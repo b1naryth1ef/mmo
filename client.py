@@ -1,16 +1,16 @@
 import socket, zlib, thread, json, time
 
-PROTOCOL_VERSION = 1
+PROTOCOL_VERSION = 2
 
 HOST = 'localhost'
 PORT = 1338
-PREFIX = {'start':'', 'end':'\r\n'}
+PREFIX = {'start':'\x02', 'end':'\r\n'}
 
 class Client():
 	def __init__(self, data=('localhost', 27960)):
 		self.host, self.port = data
 		self.c = None
-		self.queue = collections.deque()
+		#self.queue = collections.deque()
 		self.serverInfo = {}
 
 		self.name = 'Jeffery'
@@ -29,7 +29,7 @@ class Client():
 			try:
 				self.c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				self.c.connect((self.host, self.port))
-				self.write('\x00HELLO')
+				self.write({'tag': 'HELLO'})
 			except:
 				return (False, 'Error with connecting... (Internet problems?)')
 			try:
@@ -51,7 +51,6 @@ class Client():
 						else:
 							self.send_joinReq()
 							r = self.read()
-							print type(r)
 							if type(r) == dict:
 								if r['tag'] == 'WELCOME':
 									self.hash = r['hash']
@@ -62,21 +61,16 @@ class Client():
 			return (False, 'Error doing shit with the server!')
 
 	def send_joinReq(self):
-		self.write('\x02'+zlib.compress(json.dumps({'tag':'JOIN_REQ', 'name':self.name, 'hash':self.hash})))
+		self.write({'tag':'JOIN_REQ', 'name':self.name, 'hash':self.hash})
 
 	def disconnect(self): pass
 	def write(self, line):
-		self.c.send('%s%s%s' % (PREFIX['start'], line, PREFIX['end']))
+		self.c.send('%s%s%s' % (PREFIX['start'], zlib.compress(json.dumps(line)), PREFIX['end']))
 	def read(self, a=1024):
 		line = self.c.recv(a)
 		if line:
-			if line.startswith('\x00'):
-				return line[1:].strip()
-			elif line.startswith(('\x01', '\x02')):
-				newline = zlib.decompress(line[1:])
-				if line.startswith('\x02'):
-					return dict(json.loads(newline))
-				return newline
+			if line.startswith('\x02'):
+				return json.loads(zlib.decompress(line[1:]))
 				
 	def parse(self, line): pass
 	def event_PING(self, E): pass
