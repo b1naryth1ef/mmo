@@ -56,3 +56,30 @@ class ThreadSafe():
 	def __exit__(self, exc_type, exc_value, traceback):
 		if self.locked:
 			self.locked = False
+
+class User():
+	def __init__(self, name, conn):
+		self.name = name
+		self.alias = name
+		self.conn = conn
+		self.pos = [1, 1]
+		self.methods = USER_METHODS
+
+	def setPos(self, pos):
+		self.pos = pos or [1, 1]
+
+	def getPos(self, null):
+		return self.pos
+
+	def setName(self, name):
+		print name
+		self.alias = name or self.name
+
+	def getName(self, null):
+		return self.alias
+
+USER_METHODS = {
+'setPos':User.setPos, 
+'getPos':User.getPos, 
+'setName':User.setName, 
+'getName':User.getName}

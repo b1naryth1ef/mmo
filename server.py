@@ -2,9 +2,9 @@ import zlib, collections, json, md5, random, time, thread
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor, task
-from classes import ThreadSafe, HookException, SlotSystem
+from classes import ThreadSafe, HookException, SlotSystem, User
 
-PROTOCOL_VERSION = 2
+PROTOCOL_VERSION = 3
 THREADING = True
 MAX_SLOTS = 10
 NAME = 'My Sexy Server!'
@@ -23,19 +23,21 @@ def Hook(hook):
 		raise HookException('Hook %s already exsists' % hook)
 	return deco
 
-class User():
-	def __init__(self, name, conn, hash=None):
-		self.name = name
-		self.conn = conn
-		self.pos = [0, 0]
-		
+def threadr(func, v):
+	thread.start_new_thread(func, v)
 
+def globalSend(data, skip=-1):
+	for i in USERS.values():
+		if i.id != skip:
+			i.send(data)
+		
 class RemoteClient(LineReceiver):
 	def __init__(self, addr):
 		self.addr = addr
 		self.state = 'INIT'
 		self.waitingForPong = False
 		self.id = None
+		self.user = None
 		self.listen = True
 
 	def send(self, line):
@@ -46,7 +48,7 @@ class RemoteClient(LineReceiver):
 
 	def connectionLost(self, reason):
 		print 'Disconnected: %s' % reason
-		if self.id != None: SLOTS[self.id] = None
+		if self.state == 'CONN' and self.id: SLOTS.rmvUser(self.id)
 
 	def lineReceived(self, line):
 		if not self.listen: return		
@@ -57,12 +59,15 @@ class RemoteClient(LineReceiver):
 					HOOKS[line['tag']](self, line)
 		except Exception, e:
 		 	print 'Was not able to parse line! (%s)' % e
-		print '%s: %s' % (self.id, line)
+		if line['tag'] not in ['POS']:
+			print '%s: %s' % (self.id, line)
 
 	@Hook('POS')
-	def event_POS(self, packet): pass
-		#@TODO Validate the pos first
-		#USERS[self.id].pos = packet['pos']
+	def event_POS(self, packet):
+		#@TODO Validate pos here
+		self.user.pos = packet['pos']
+		if self.id == packet['id']:
+			threadr(globalSend, (packet, self.id))
 
 	@Hook('ACTION')
 	def event_ACTION(self, packet): pass
@@ -77,8 +82,9 @@ class RemoteClient(LineReceiver):
 	@Hook('JOIN_REQ')
 	def event_JOINREQ(self, packet):
 		def _s(): 
-			SLOTS.addUser(User(packet['name'], self))
-			self.send({'tag':'WELCOME', 'hash':00000, 'motd':MOTD})
+			self.id = SLOTS.addUser(User(packet['name'], self))
+			self.user = SLOTS[self.id]
+			self.send({'tag':'WELCOME', 'hash':00000, 'motd':MOTD, 'id':self.id})
 			self.state = 'CONN'
 			self.task = task.LoopingCall(self.action_PING)
 			self.task.start(300) #Ping request every 5 mins
@@ -93,13 +99,12 @@ class RemoteClient(LineReceiver):
 
 	@Hook('PONG')
 	def event_PONG(self, packet):
-		print 'Got pong!'
 		self.waitingForPong = False
 
 	def action_PING(self):
 		self.send({'tag':'PING'})
 		self.waitingForPong = True
-		reactor.callLater(5, self.hasPonged)
+		reactor.callLater(25, self.hasPonged)
 
 	def action_KICK(self, reason):
 		self.send({'tag':'KICK', 'reason':reason})
