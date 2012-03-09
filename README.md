@@ -11,18 +11,8 @@ I use a tagging system created by myself. It's fairly easy to read so I wont pro
 ## Packet Prefixes
 - `\x02`: The only currently used packet. A json dumped dictionary compress with zlib (Remember, its \x02content, so zlib.decompress(line[1:]))
 
-## Server Packet Tags
-PING    
-WELCOME    
-KICK    
-
-## Client Packet Tags
-HELLO    
-JOIN_REQ      
-PONG 
-ACTION    
-ENT_ACTION    
-POS       
+## Protocol
+Server can call events on a user from literal function calls (aka getName, setName), client must push events with calls like POS, etc.  
 
 ## Joining
 Client >< Server: Gets hello, gets info. Checks protocol version, and if server is full.    

@@ -79,6 +79,9 @@ class RemoteClient(LineReceiver):
 	def event_HELLO(self, packet):
 		self.send({'tag':'INFO', 'version':PROTOCOL_VERSION, 'name':NAME, 'maxclients':MAX_SLOTS, 'clients':SLOTS.userCount()})
 
+	@Hook('ACTION_RESP')
+	def event_ACTIONRESP(self, packet): pass
+
 	@Hook('JOIN_REQ')
 	def event_JOINREQ(self, packet):
 		def _s(): 

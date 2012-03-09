@@ -68,14 +68,14 @@ class User():
 	def setPos(self, pos):
 		self.pos = pos or [1, 1]
 
-	def getPos(self, null):
+	def getPos(self):
 		return self.pos
 
 	def setName(self, name):
 		print name
 		self.alias = name or self.name
 
-	def getName(self, null):
+	def getName(self):
 		return self.alias
 
 USER_METHODS = {

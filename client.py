@@ -28,6 +28,7 @@ class Client():
 
 		self.state = 'DISCONNECTED'
 		self.c = None
+		self.hash = None
 		self.id = None
 		self.connected = False
 
@@ -41,8 +42,9 @@ class Client():
 				self.connected = True
 				self.c.settimeout(10)
 				self.parse(self.read())
-			except:
-				return (False, 'Error with connecting... (Internet problems?)')
+			except Exception, e:
+				print e
+				return
 			finally:
 				self.c.settimeout(None)
 			thread.start_new_thread(self.readLoop, ())
@@ -120,7 +122,9 @@ class Client():
 	@Hook('ACTION')
 	def event_ACTION(self, E):
 		if E['action'] in self.user.methods:
-			self.user.methods[E['action']](self.user, *E['data'])
+			r = self.user.methods[E['action']](self.user, *E['data'])
+			if r:
+				self.write({'tag':'ACTION_RESP', 'data':r})
 
 	@Hook('ENT_ACTION')
 	def event_ENTACTION(self, E): pass
