@@ -12,13 +12,17 @@ class SlotSystem():
 		self.lock = ThreadSafe()
 
 	def it(self):
-		return [i for i in self._s if self._s[i] == None]]
+		return [i for i in self._s if self._s[i] == None]
 
 	def getFreeSlot(self):
-		return min(self.it())
+		a = self.it()
+		if len(a) > 0:
+			return min(a)
+		else:
+			return False
 
 	def userCount(self):
-		return len(self.it())
+		return self.slots - len(self.it())
 
 	def addUser(self, user):
 		with self.lock:
